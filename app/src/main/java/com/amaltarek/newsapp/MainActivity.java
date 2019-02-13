@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.amaltarek.newsapp.Adapter.NewsAdapter;
 import com.amaltarek.newsapp.Loader.NewsLoader;
@@ -24,9 +25,16 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<News>>, SwipeRefreshLayout.OnRefreshListener{
 
+    private static final String LOG_TAG = MainActivity.class.getName();
+
     private NewsAdapter mAdapter;
-    private static int LOADER_ID = 0;
+
+    private static int NEWS_LOADER_ID = 0;
+
     SwipeRefreshLayout mSwipeLayout;
+
+    /** TextView that is displayed when the list is empty */
+    private TextView mEmptyStateTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +46,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mSwipeLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
 
         ListView listView = (ListView) findViewById(R.id.news_list);
+
+        mEmptyStateTextView = (TextView) findViewById(R.id.empty_view);
+        listView.setEmptyView(mEmptyStateTextView);
 
         // Create a new adapter that takes an empty list of earthquakes as input
         mAdapter = new NewsAdapter(this, new ArrayList<News>());
@@ -66,11 +77,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             LoaderManager loaderManager = getSupportLoaderManager();
 
             // Initialize the loader. Pass in the int ID constant defined above and pass in null for
-            loaderManager.initLoader(LOADER_ID, null, this);
+            loaderManager.initLoader(NEWS_LOADER_ID, null, this);
         } else {
+            // Otherwise, display error
+            // First, hide loading indicator so error message will be visible
+            View loadingIndicator = findViewById(R.id.loading_indicator);
+            loadingIndicator.setVisibility(View.GONE);
 
             // Update empty state with no connection error message
-           // mEmptyStateTextView.setText(R.string.no_internet_connection);
+            mEmptyStateTextView.setText(R.string.no_internet_connection);
         }
     }
 
@@ -81,19 +96,31 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
-    public void onLoadFinished(Loader<List<News>> loader, List<News> data) {
+    public void onLoadFinished(Loader<List<News>> loader, List<News> news) {
+        // Hide loading indicator because the data has been loaded
+        View loadingIndicator = findViewById(R.id.loading_indicator);
+        loadingIndicator.setVisibility(View.GONE);
+
+        // Set empty state text to display "No earthquakes found."
+        mEmptyStateTextView.setText(R.string.no_content_found);
+
+        // Clear the adapter of previous earthquake data
+        //mAdapter.clear();
         mSwipeLayout.setRefreshing(false);
-        if (data != null) {
+        // If there is a valid list of {@link Earthquake}s, then add them to the adapter's
+        // data set. This will trigger the ListView to update.
+        if (news != null && !news.isEmpty()) {
             mAdapter.setNotifyOnChange(false);
             mAdapter.clear();
             mAdapter.setNotifyOnChange(true);
-            mAdapter.addAll(data);
+            mAdapter.addAll(news);
         }
     }
 
     @Override
     public void onLoaderReset(Loader<List<News>> loader) {
-
+        // Loader reset, so we can clear out our existing data.
+        mAdapter.clear();
     }
 
     /**
@@ -101,6 +128,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      */
     @Override
     public void onRefresh() {
-        getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
+        getSupportLoaderManager().restartLoader(NEWS_LOADER_ID, null, this);
     }
 }

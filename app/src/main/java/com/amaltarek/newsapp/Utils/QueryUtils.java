@@ -81,10 +81,10 @@ public final class QueryUtils {
         builder.scheme("http")
                 .encodedAuthority("content.guardianapis.com")
                 .appendPath("search")
-                .appendQueryParameter("order-by", "newest")
-                .appendQueryParameter("show-references", "author")
                 .appendQueryParameter("show-tags", "contributor")
-                .appendQueryParameter("q", "Android")
+                .appendQueryParameter("order-by", "newest")
+                .appendQueryParameter("show-fields", "all")
+                .appendQueryParameter("page-size", "10")
                 .appendQueryParameter("api-key", "test");
         String url = builder.build().toString();
         return url;
