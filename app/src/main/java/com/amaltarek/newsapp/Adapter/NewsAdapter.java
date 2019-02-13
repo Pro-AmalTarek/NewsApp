@@ -38,7 +38,7 @@ public class NewsAdapter extends ArrayAdapter<News> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.news_item, parent, false);
         }
 
-        // Get the UI News and fill Content
+        // Get the UI Art News and fill Content
         ImageView newsArt = convertView.findViewById(R.id.news_thumbnail);
         String thumbnail = currentNews.getNewsArt();
         if(TextUtils.isEmpty(thumbnail)){

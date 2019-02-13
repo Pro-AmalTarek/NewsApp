@@ -26,26 +26,32 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<News>>, SwipeRefreshLayout.OnRefreshListener{
 
-    private static final String LOG_TAG = MainActivity.class.getName();
-
+    /** News Adapter */
     private NewsAdapter mAdapter;
 
+    /** News Loader Constant ID */
     private static int NEWS_LOADER_ID = 0;
 
+    /** Swipe Refresh Layout */
     SwipeRefreshLayout mSwipeLayout;
 
     /** TextView that is displayed when the list is empty */
     private TextView mEmptyStateTextView;
+
+    /** Check if Loader init or restart with swipe layout */
+    private boolean mLoaderInit = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Get Swipe Refresh Layout from Layout
         mSwipeLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
         mSwipeLayout.setOnRefreshListener(this);
         mSwipeLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
 
+        // Get List View and Make it Scroll smoothly
         final ListView listView = (ListView) findViewById(R.id.news_list);
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -78,6 +84,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
 
+        checkConnectivity();
+    }
+
+    /**
+     * Check Network Connectivity to fetch new Data
+     */
+    private void checkConnectivity(){
         // Get a reference to the ConnectivityManager to check state of network connectivity
         ConnectivityManager connMgr = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -90,8 +103,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             // Get a reference to the LoaderManager, in order to interact with loaders.
             LoaderManager loaderManager = getSupportLoaderManager();
 
-            // Initialize the loader. Pass in the int ID constant defined above and pass in null for
-            loaderManager.initLoader(NEWS_LOADER_ID, null, this);
+            // Check if Loader this is the first Time to init or not just restart
+            if(mLoaderInit){
+                // Initialize the loader. Pass in the int ID constant defined above and pass in null for
+                loaderManager.initLoader(NEWS_LOADER_ID, null, this);
+                mLoaderInit = false;
+            }else{
+                loaderManager.restartLoader(NEWS_LOADER_ID, null, this);
+            }
+
         } else {
             // Otherwise, display error
             // First, hide loading indicator so error message will be visible
@@ -102,7 +122,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             mEmptyStateTextView.setText(R.string.no_internet_connection);
         }
     }
-
 
     @Override
     public Loader<List<News>> onCreateLoader(int id, Bundle args) {
@@ -142,6 +161,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      */
     @Override
     public void onRefresh() {
-        getSupportLoaderManager().restartLoader(NEWS_LOADER_ID, null, this);
+        checkConnectivity();
     }
 }
