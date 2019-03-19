@@ -18,6 +18,8 @@ import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
+// Just nitpicking here, but this is an unused import and should be removed for optimal formatting. I usually run the Code Inspector to get such (and many other tips and improvements suggested by Android).
+// By click on Analyze -- inspect Code
 
 
 public class NewsAdapter extends ArrayAdapter<News> {
