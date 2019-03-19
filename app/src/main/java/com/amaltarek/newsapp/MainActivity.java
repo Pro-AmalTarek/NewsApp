@@ -137,7 +137,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // Set empty state text to display "No earthquakes found."
         mEmptyStateTextView.setText(R.string.no_content_found);
 
+        /*Before or at the same time we get this message of no news (or in the current case before seeing a non-working list again), we should check connectivity again!
+
+        To make this work correctly all the time (it works fine if there is really no news (again, assuming you clear the adapter, see next note), but not if the problem is no internet, see the scenario described in Project Review) you have to add another connectivity check.
+
+        Can you make this work in your code? We cannot just give sample code but think if/else for example, because there are many ways to get this done, the key is (1) understanding what is currently happening, and this means testing out the error messages; (2) understanding how it actually should work; (3) designing the code.
+
+        Note: simulate loss of connection by putting device in airplane mode.
+
+        Note: simulate no news by modifying the query, you could search for lkjlkjlkjlkjlkjlkjjkl or something sure to have zero results!
+
+        Have fun here, because once you fix this you will have mastered a very special detail that many overlook and gloss over! And those little details make the difference between good and great in app dev!*/
+        
         // Clear the adapter of previous earthquake data
+        //You have this commented out, but clearing the adapter is important to prevent a memory leak. This code should activate before the error message in line 138.
         //mAdapter.clear();
         mSwipeLayout.setRefreshing(false);
         // If there is a valid list of {@link Earthquake}s, then add them to the adapter's
